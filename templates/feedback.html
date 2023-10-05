@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}Feedback Form{% endblock %}
+
+{% block content %}
+
+<h2>Feedback Form</h2>
+<form method="POST">
+    {{ form.hidden_tag() }}
+    <div>
+        {{ form.title.label }}
+        {{ form.title(size=100) }}
+    </div>
+    <div>
+        {{ form.content.label }}
+        {{ form.content() }}
+    </div>
+    <div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+        <a href='/users/{{session["username"]}}' class="btn btn-secondary">Cancel</a>
+    </div>
+</form>
+
+{% endblock %}

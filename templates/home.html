@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}HOME PAGE{% endblock %}
+
+{% block content %}
+<h1>FlightCast</h1>
+
+<h2>Flight Search</h2>
+<form id="flight-search-form">
+    <label for="departure-city">Departure City:</label>
+    <input type="text" id="departure-city" name="departureCity" required>
+    
+    <label for="arrival-city">Arrival City:</label>
+    <input type="text" id="arrival-city" name="arrivalCity" required>
+    
+    <label for="depart-date">Depart:</label>
+    <input type="date" id="depart-date" name="departDate" required>
+    
+    <label for="Return-date">Return:</label>
+    <input type="date" id="return-date" name="retureDate" required>
+
+    <button type="submit">Search Flights</button>
+</form>
+
+<div id="flight-results">
+    <!-- Flight search results will be displayed here -->
+</div>
+{% endblock %}

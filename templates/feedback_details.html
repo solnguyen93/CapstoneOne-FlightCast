@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}Feedback Details{% endblock %}
+
+{% block content %}
+
+{% if 'username' in session and session['username'] == feedback.user_username %}
+<div>
+    <form method="POST" id="update-form" action="/feedbacks/{{ feedback.id }}" data-username='{{ session["username"] }}' data-id='{{ feedback.id }}'>
+        <label for="title">Title:</label>
+        <input type="text" id="title" name="title" value="{{ feedback.title }}" required>
+
+        <label for="content">Content:</label>
+        <input type="text" id="content" name="content" value="{{ feedback.content }}" required>
+
+        <input type="submit" value="Update" class='btn btn-primary update-feedback'>
+
+    </form>
+
+    <a href='/users/{{ session["username"] }}' class="btn btn-secondary">Cancel</a>
+
+    <button class='btn btn-danger delete-feedback' data-username='{{ session["username"] }}' data-id='{{feedback.id}}'>Delete</button>
+</div>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}User Details{% endblock %}
+
+{% block content %}
+
+{% if 'username' in session and session['username'] == user.username%}
+<h1>User Details</h1>
+<p>Username: {{ user.username }}</p>
+<p>Email: {{ user.email }}</p>
+<p>First Name: {{ user.first_name }}</p>
+<p>Last Name: {{ user.last_name }}</p>
+<button id="delete-user" class="btn btn-danger" data-username="{{ user.username }}">Delete User</button>
+
+<h1>User Feedbacks</h1>
+<ul>
+    {% for feedback in user.feedbacks %}
+        <li>
+            <h2>{{ feedback.title }}</h2>
+            <p>{{ feedback.content }}</p>
+            <a href='/feedbacks/{{feedback.id}}' class="btn btn-secondary">Edit</a>
+        </li>
+    {% endfor %}
+</ul>
+
+<div>
+    <a href='/feedbacks' class="btn btn-primary">Add Feedback</a>
+</div>
+{% endif %}
+
+{% endblock %}
