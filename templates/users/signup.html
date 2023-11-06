@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}SIGN UP{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-md-center">
+  <div class="col-md-7 col-lg-5">
+    <h2>Sign Up</h2>
+    <p>Quick and easy.</p>
+    <form id="user_form" method="POST" action="/signup">
+        <div class="form-row">
+            {{ form.hidden_tag() }}
+            <div class="form-group col-md-4" >
+                {{form.username.label}}
+                {{form.username(class_="form-control")}}
+            </div>
+            <div class="form-group col-md-4">
+                {{form.password.label}}
+                {{form.password(class_="form-control")}}
+            </div>
+            <div class="form-group col-md-4">
+              {{form.email.label}}
+              {{form.email(class_="form-control")}}
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">CREATE ACCOUNT</button>
+        </div>
+    </form>
+    <p class="fine-print">By clicking 'CREATE ACCOUNT', you agree to our Terms and Conditions, acknowledge that you have read our Privacy Policy.</p>
+  </div>
+</div>
+
+{% endblock %}

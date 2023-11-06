@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}FLIGHT DETAILS{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+
+    <div id="flight-results">
+        <h3>Previous Flight Search:</h3>
+        {% if flights %}
+        <ul>
+            {% for flight in flights %}
+            <li>{{ flight.departure_city.name }} - {{ flight.arrival_city.name }} | {{ flight.depart_style_date }} - {{ flight.return_style_date }}</li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>No flight results to display.</p>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}
+

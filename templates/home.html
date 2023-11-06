@@ -1,28 +1,69 @@
 {% extends 'base.html' %}
 
-{% block title %}HOME PAGE{% endblock %}
+{% block title %}HOME{% endblock %}
 
 {% block content %}
-<h1>FlightCast</h1>
 
-<h2>Flight Search</h2>
-<form id="flight-search-form">
-    <label for="departure-city">Departure City:</label>
-    <input type="text" id="departure-city" name="departureCity" required>
-    
-    <label for="arrival-city">Arrival City:</label>
-    <input type="text" id="arrival-city" name="arrivalCity" required>
-    
-    <label for="depart-date">Depart:</label>
-    <input type="date" id="depart-date" name="departDate" required>
-    
-    <label for="Return-date">Return:</label>
-    <input type="date" id="return-date" name="retureDate" required>
+<div class="container mt-5">
 
-    <button type="submit">Search Flights</button>
-</form>
+    <h2 class="mb-4">Flight Search</h2>
+    <form id="flight-search-form" method="post" action="/submit">
+        <div class="form-row">
+            {{ form.hidden_tag() }}
+            <div class="form-group col-md-4" >
+                {{form.departure_location.label}}
+                {{form.departure_location(class_="form-control city-input", id="departure-city")}}
+                <div id="departure-city-suggestions" class="suggestions"></div>
+            </div>
+            <div class="form-group col-md-4">
+                {{form.arrival_location.label}}
+                {{form.arrival_location(class_="form-control city-input", id="arrival-city")}}
+                <div id="arrival-city-suggestions" class="suggestions"></div>
+            </div>
+            <div class="form-group col-md-2">
+                {{form.depart_date.label}}
+                {{form.depart_date(class_="form-control", id="depart-date")}}
+            </div>
+            <div class="form-group col-md-2">
+                {{form.return_date.label}}
+                {{form.return_date(class_="form-control", id="return-date")}}
+            </div>
+            <div class="form-group col-md-2">
+                {{form.passengers.label}}
+                {{form.passengers(class_="form-control", id="passengers")}}
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary mb-5">Search</button>
+    </form>
 
-<div id="flight-results">
-    <!-- Flight search results will be displayed here -->
+    <h2 class="mb-4">Saved Flights</h2>
+    {% if not g.user %}
+        <p>To save a flight, please <a href="/signup"> sign up</a> or <a href="/signup"> log in</a>.</p>
+    {% else %}
+        <div id="saved-flights-container">
+            {% if saved_flights %}
+                {% for flight in saved_flights %}
+                    <div class="saved-flight-container">
+                        <p class="fromTo">{{ flight.departure_location.code }} - {{ flight.arrival_location.code }}</p>
+                        <p class="time">{{ flight.depart_date }} - {{ flight.return_date }}</p>
+                        <p class="num-stops">{{ flight.num_stops }}</p>
+                        <p class="total-duration">{{ flight.total_duration }}</p>
+                        <p class="price">{{ flight.price }}</p>
+                        <button class="btn btn-danger btn-sm delete-flight-btn" data-flight-id="{{ flight.id }}">Delete</button>
+                    </div>
+                {% endfor %}
+            {% else %}
+            <p>No flight results to display.</p>
+            {% endif %}
+        </div>
+    {% endif %}
+
 </div>
 {% endblock %}
+
+
+
+
+
+
+

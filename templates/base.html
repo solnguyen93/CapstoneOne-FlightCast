@@ -7,8 +7,11 @@
     <title>
         {% block title %}{% endblock %}
     </title>
-    <link rel="stylesheet" href="/static/style.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script src="{{ url_for('static', filename='config.js') }}"></script>
     <!-- Bootstrap and related libraries -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -20,54 +23,69 @@
 <body>
 
     <header>
-        <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
-            <a class="navbar-brand" href="/">HOME</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ml-auto">
-                    {% if 'username' in session %}
-                        <li class="nav-item">
-                            <div class="row">
-                                <form method="POST" action="/logout" class="mr-2">
-                                    <button type="submit" class="btn btn-danger">Logout</button>
-                                </form>
-                                <form method="GET" action="/users/{{session['username']}}" class="mr-2">
-                                    <button type="submit" class="btn btn-primary col">User Details and Feedbacks</button>
-                                </form>
-                            </div>
+
+        <nav class="navbar navbar-expand navbar-fixed-top">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <a href="/" class="navbar-brand">
+                        <span>FlightCast</span>
+                    </a>
+                </div>
+                <ul class="nav navbar-nav navbar-right">
+                    {% if not g.user %}
+                        <li class="mr-4"><a href="/signup">Sign up</a></li>
+                        <li><a href="/login">Log in</a></li>
+                    {% else %}
+                        <li>
+                            <a href="/users/{{ g.user.id }}" class="nav-item user-circle mr-2">
+                                {{ g.user.username[0].upper() }}
+                            </a>
                         </li>
+                        <li><a href="/logout" id="logout-btn">Log out</a></li>
                     {% endif %}
-                    {% if 'username' not in session and request.path != '/login' %}
-                    <li class="nav-item">
-                        <div class="row">
-                            <form method="POST" action="/login" class="mr-2">
-                                <button type="submit" class="btn btn-primary col">Login</button>
-                            </form>
-                            <form method="GET" action="/register" class="mr-2">
-                                <button type="submit" class="btn btn-primary col">Register</button>
-                            </form>
-                        </div>
-                    </li>
-                    {% endif %}   
                 </ul>
             </div>
         </nav>
+
     </header>
 
     <main id="content-container" style="padding-top: 60px;">
-        <div class="flash-container">
+        
+        <div class="loader" style="display:none";>
+            <div class="circle">
+                <div class="plane-wrapper">
+                <i class="fas fa-plane"></i>
+                </div>
+            </div>
+        </div>
+          
+        <div id="flash-message"></div>
+
+        <div class="field-errors-container">
+            {% for field in form %}
+                {% for error in field.errors %}
+                    <span class="text-danger">{{ error }}</span>
+                {% endfor %}
+            {% endfor %}
+        </div>
+
+        <div class="server-flash-container">
             {% for category, message in get_flashed_messages(with_categories=true) %}
                 <div class="alert alert-{{ category }}">{{ message }}</div>
             {% endfor %}
         </div>
+
         {% block content %}{% endblock %}
+
     </main>
 
+
+
     <footer>
+
         <!-- Your footer content goes here -->
+
     </footer>
-    <script type="text/javascript" src="/static/script.js"></script>
+
 </body>
 </html>

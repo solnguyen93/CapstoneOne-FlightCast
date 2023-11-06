@@ -1,0 +1,150 @@
+.segment, .flight {
+    margin-left: 40px;
+}
+
+.flight-id, 
+.segment-id, 
+.flight-container .num-stops, 
+.flight-container .total-duration, 
+.flight-container .price, 
+.fromTo 
+{
+    font-weight: bold;
+}
+
+.navbar-fixed-top {
+    background-color: #4fbcff;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: 40px;
+    z-index: 7;
+}
+
+.alert-welcome-msg, .alert-goodbye-msg{
+    background-color: transparent;
+    border: none;
+    font-size: 18px;
+    color: #4fbcff;
+}
+
+.fine-print {
+    font-size: 0.8em;
+    color: #a4a4a4;
+
+}
+
+.navbar a {
+    color: white !important;
+}
+
+.flight-container, .saved-flight-container {
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.user-circle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 25px;
+    height: 25px; 
+    background-color: #007bff; 
+    border-radius: 50%;
+    font-size: 16px;
+}
+
+.user-circle:hover {
+    transform: scale(1.1);
+    text-decoration: none;
+}
+
+#flash-message {
+    position: fixed;
+    top: -50px; /* initially hidden */
+    left: 0;
+    right: 0;
+    text-align: center;
+    padding: 10px;
+    z-index: 10;
+    transition: top 0.5s ease-in-out; /* animation settings */
+}
+  
+#flash-message.show {
+    top: 0; /* slide down */
+}
+  
+
+.success {
+    background-color: green;
+    color: white;
+}
+
+.error {
+    background-color: red;
+    color: white;
+}
+
+.warning {
+    background-color: yellow;
+    color: black;
+}
+
+.loader {
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: rgba(170, 170, 170, 0.5);
+    z-index: 8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+  
+    .circle {
+        width: 100px;
+        height: 100px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 9;
+    }
+    
+    .plane-wrapper {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 100%;
+        height: 100%;
+        animation: spinAround 2s infinite linear;
+    }
+    
+    .fas.fa-plane {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        font-size: 24px;
+    }
+    
+    @keyframes spinAround {
+        0% {
+        transform: rotate(0deg);
+        }
+        100% {
+        transform: rotate(360deg);
+        }
+    }
+  
+  
+  
+  
+  
+  
+  
+  

@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}SEARCH RESULTS{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+
+    <div id="flights-container">
+        {% if flight_data.data %}
+            {% for flight in flight_data.data %}
+                <div class="flight-container">
+                    <p class="flight-id">Flight ID: {{ flight.id }}</p>
+                    {% set has_multiple_segments = flight.itineraries[0].segments|length > 1 %}
+                
+                    {% for segment in flight.itineraries[0].segments %}
+                        {% if has_multiple_segments %}<p class="segment-id">Segment: {{ loop.index }}</p>{% endif %}
+                        <div class="segment">
+                            <p class="duration">{{ segment.duration }}</p>
+                            <p class="location">{{ segment.departure.iataCode }} - {{ segment.arrival.iataCode }}</p>
+                            <p class="time">{{ segment.departure.at }} - {{ segment.arrival.at }}</p>
+                        </div>      
+                    {% endfor %}   
+                
+                    <p class="num-stops">{{ flight.itineraries[0].segments|length - 1 }}</p>
+                
+                    {% if has_multiple_segments %}
+                        <p class="total-duration">{{ flight.itineraries[0].duration }}</p>
+                    {% endif %}
+                    
+                    <p class="price">{{ flight.price.total }}</p>
+
+                    {% if g.user %}
+                        <button class="btn btn-primary save-flight-btn" data-flight-id="{{ flight.id }}">Save</button>
+                    {% endif %}
+                </div>    
+            {% endfor %}        
+        {% else %}
+            <p>No flight results to display.</p>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}
+
+
+
+
+
+
