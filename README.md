@@ -4,33 +4,41 @@ FlightCast is a web application that allows users to search for flights, providi
 
 ## Getting Started
 
-To get a local copy up and running follow these simple steps.
+To get a local copy up and running follow these steps.
 
 ### Prerequisites
 
 - Install Python 3.8 or higher: [Python Installation Guide](https://www.python.org/downloads/)
 - Install PostgreSQL: [PostgreSQL Installation Guide](https://www.postgresql.org/download/)
 
+
+### Step 1: Clone the Repository
 ```bash
-# Step 1: Clone the Repository
 git clone https://github.com/solnguyen93/CapstoneProjectOne-FlightCast.git
+```
+
+### Step 2: Install Dependencies
+```bash
 cd CapstoneProjectOne-FlightCast
-
-# Step 2: Install Dependencies
 pip install -r requirements.txt
+```
 
-# Step 3: Database Configuration
-# Ensure PostgreSQL is installed and running
-# Create a database named 'flightcast':
+### Step 3: Database Configuration
+Ensure PostgreSQL is installed and running. Create a database named 'flightcast':
+
+```bash
 createdb flightcast
+```
 
-# Update the database URI in app.py if necessary
-# The default is set to 'postgresql:///flightcast'
+Update the database URI in app.py if necessary. The default is set to 'postgresql:///flightcast'
 
-# Set the FLASK_APP environment variable
+### Step 4: Set the FLASK_APP environment variable
+```bash
 export FLASK_APP=app.py
+```
 
-# Run the Flask application
+### Step 5:  Run the Flask application
+```bash
 flask run
 ```
 
