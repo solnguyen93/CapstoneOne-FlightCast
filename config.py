@@ -1,5 +1,3 @@
-SECRET_KEY = 'secret_key_here'
-
 # Flights API: Amadeus
 # https://developers.amadeus.com/
 CLIENT_ID = 'y8Jnzsv7rQQxNhOuqZXf8JubTDUZ7GAb'

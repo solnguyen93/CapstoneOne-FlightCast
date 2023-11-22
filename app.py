@@ -2,7 +2,6 @@ from flask import Flask, render_template, redirect, flash, session, request, jso
 from sqlalchemy.exc import IntegrityError
 from forms import FlightForm, UserForm, LoginForm
 from models import db, Flight, Location, User
-from config import SECRET_KEY, CLIENT_ID, CLIENT_SECRET, WEATHER_TOKEN
 import requests
 import os
 
@@ -17,6 +16,11 @@ app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 app.config['SQLALCHEMY_ECHO'] = False
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
+CLIENT_ID = os.getenv('CLIENT_ID')
+CLIENT_SECRET = os.getenv('CLIENT_SECRET')
+WEATHER_TOKEN = os.getenv('WEATHER_TOKEN')
+
+
 
 # app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL' , 'postgresql:///flightcast')
 
