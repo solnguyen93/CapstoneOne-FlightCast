@@ -12,9 +12,9 @@ def seed_database(app):
         db.drop_all() 
         db.create_all()
 
-        location_departure = Location(code='SEA')
-        location_arrival = Location(code='LAX')
-        location_arrival_2 = Location(code='ITM')
+        location_departure = Location(name='SEATTLE-TACOMA INTERNATIONAL AIRPORT', iatacode='SEA', latitude=47.4502, longitude=-122.3088)
+        location_arrival = Location(name='LOS ANGELES INTERNATIONAL AIRPORT', iatacode='LAX', latitude=33.9416, longitude=-118.4085)
+        location_arrival_2 = Location(name='CANCUN INTERNATIONAL AIRPORT', iatacode='CUN', latitude=21.0428, longitude=-86.8736)
 
         db.session.add(location_departure)
         db.session.add(location_arrival)
@@ -32,25 +32,27 @@ def seed_database(app):
         db.session.commit()
 
         flight1 = Flight(
+            flight_id=1,
             departure_location_id=1,
             arrival_location_id=2,
             depart_date=datetime(2023, 10, 25, 14, 30),
             return_date=datetime(2023, 10, 26, 16, 45), 
             passengers=1,
-            num_stops=1,
+            num_stops=0,
             total_duration='PT04H10M',
             price=289.71,    # EUR - JS will convert to USD
             user_id=user1.id
         )
 
         flight2 = Flight(
+            flight_id=2,
             departure_location_id=1,
             arrival_location_id=3,
             depart_date=datetime(2023, 11, 4, 6, 0),
             return_date=datetime(2023, 12, 11, 8, 15),
             passengers=2,
-            num_stops=0,
-            total_duration='PT17H10M',
+            num_stops=1,
+            total_duration='PT14H10M',
             price=2745.6,    # EUR
             user_id=user1.id
         )

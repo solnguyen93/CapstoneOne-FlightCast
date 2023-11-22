@@ -10,25 +10,27 @@
     <form id="flight-search-form" method="post" action="/submit">
         <div class="form-row">
             {{ form.hidden_tag() }}
-            <div class="form-group col-md-4" >
+            <div class="form-group col-md-5" >
                 {{form.departure_location.label}}
-                {{form.departure_location(class_="form-control city-input", id="departure-city")}}
-                <div id="departure-city-suggestions" class="suggestions"></div>
+                {{form.departure_location(class_="form-control city-input", id="departure_location", oninput="this.value = this.value.toUpperCase()", autocomplete="off")}}
+                <div id="departure_location_suggestions" class="suggestions" style="display:none"></div>
             </div>
-            <div class="form-group col-md-4">
+            <div class="form-group col-md-5">
                 {{form.arrival_location.label}}
-                {{form.arrival_location(class_="form-control city-input", id="arrival-city")}}
-                <div id="arrival-city-suggestions" class="suggestions"></div>
+                {{form.arrival_location(class_="form-control city-input", id="arrival_location", oninput="this.value = this.value.toUpperCase()", autocomplete="off")}}
+                <div id="arrival_location_suggestions" class="suggestions" style="display:none"></div>
             </div>
+        </div>
+        <div class="form-row">
             <div class="form-group col-md-2">
                 {{form.depart_date.label}}
-                {{form.depart_date(class_="form-control", id="depart-date")}}
+                {{form.depart_date(class_="form-control", id="depart_date")}}
             </div>
             <div class="form-group col-md-2">
                 {{form.return_date.label}}
-                {{form.return_date(class_="form-control", id="return-date")}}
+                {{form.return_date(class_="form-control", id="return_date")}}
             </div>
-            <div class="form-group col-md-2">
+            <div class="form-group col-md-1">
                 {{form.passengers.label}}
                 {{form.passengers(class_="form-control", id="passengers")}}
             </div>
@@ -38,32 +40,35 @@
 
     <h2 class="mb-4">Saved Flights</h2>
     {% if not g.user %}
-        <p>To save a flight, please <a href="/signup"> sign up</a> or <a href="/signup"> log in</a>.</p>
+        <p>To save a flight, please <a href="/signup"> sign up</a> or <a href="/login"> log in</a>.</p>
     {% else %}
         <div id="saved-flights-container">
             {% if saved_flights %}
                 {% for flight in saved_flights %}
                     <div class="saved-flight-container">
-                        <p class="fromTo">{{ flight.departure_location.code }} - {{ flight.arrival_location.code }}</p>
-                        <p class="time">{{ flight.depart_date }} - {{ flight.return_date }}</p>
-                        <p class="num-stops">{{ flight.num_stops }}</p>
-                        <p class="total-duration">{{ flight.total_duration }}</p>
-                        <p class="price">{{ flight.price }}</p>
-                        <button class="btn btn-danger btn-sm delete-flight-btn" data-flight-id="{{ flight.id }}">Delete</button>
+                        <p class="fromTo">({{ flight.departure_location.iatacode }}) {{ flight.departure_location.name }} - ({{ flight.arrival_location.iatacode }}) {{ flight.arrival_location.name }}</p>
+                        <p class="time days">{{ flight.depart_date }} - {{ flight.return_date }}</p>
+                        <div class="details-container">
+                            <div class="text-container">
+                                <p style="display:none" class="arrivalLatLong">{{ flight.arrival_location.latitude }},{{ flight.arrival_location.longitude }}</p>
+                                <p><strong>Departing Flight Details</strong></p>
+                                <p>Flight ID: {{ flight.flight_id }}</p>
+                                <p class="num-stops">{{ flight.num_stops }}</p>
+                                <p class="total-duration">{{ flight.total_duration }}</p>
+                                <p>Passengers: {{ flight.passengers }}</p>
+                                <p class="price">{{ flight.price }}</p>
+                                <button class="btn btn-danger btn-sm delete-flight-btn" data-flight-id="{{ flight.id }}">Delete</button>
+                            </div>   
+                            <div class="weather-container">
+                            </div>
+                        </div>
                     </div>
                 {% endfor %}
             {% else %}
-            <p>No flight results to display.</p>
+            <p>No saved flights to display.</p>
             {% endif %}
         </div>
     {% endif %}
 
 </div>
 {% endblock %}
-
-
-
-
-
-
-

@@ -1,7 +1,10 @@
 SECRET_KEY = 'secret_key_here'
 
+# Flights API: Amadeus
+# https://developers.amadeus.com/
 CLIENT_ID = 'y8Jnzsv7rQQxNhOuqZXf8JubTDUZ7GAb'
 CLIENT_SECRET = 'ukrWYNJiTtEEBy9F'
 
-
-weatherApiKey = '046Hj0ISUhUytIDjlMMtmGOe4lkpNqD2'
+# Weather API: Visual Crossing
+# https://www.visualcrossing.com/weather-api
+WEATHER_TOKEN = 'JT9SMSDCTAWQK875DJEFEXA5F'

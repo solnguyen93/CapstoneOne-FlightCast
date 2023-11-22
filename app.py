@@ -2,8 +2,8 @@ from datetime import datetime
 from flask import Flask, render_template, redirect, flash, session, request, jsonify, g
 from sqlalchemy.exc import IntegrityError
 from forms import FlightForm, UserForm, LoginForm
-from models import db, Flight, Location, Weather, User
-from config import SECRET_KEY, CLIENT_ID, CLIENT_SECRET
+from models import db, Flight, Location, User
+from config import SECRET_KEY, CLIENT_ID, CLIENT_SECRET, WEATHER_TOKEN
 import requests
 
 CURR_USER_KEY = "curr_user"
@@ -14,7 +14,7 @@ app = Flask(__name__)
 # Config settings
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///flightcast'
 app.config['SECRET_KEY'] = SECRET_KEY
-app.config['SQLALCHEMY_ECHO'] = True
+app.config['SQLALCHEMY_ECHO'] = False
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
@@ -46,167 +46,183 @@ def flash_form_errors(form):
 
 @app.route('/', methods=['GET'])
 def home():
-    """Show homepage and list of last saved flights."""
+    """Show homepage and list of saved flights if logged in."""
+    fetch_token()
     session.pop('search_results', None)
     form = FlightForm()
-    saved_flights = Flight.query.order_by(Flight.id.desc()).limit(5).all()
+    if g.user:
+        saved_flights = Flight.query.filter_by(user_id=g.user.id).order_by(Flight.id.desc()).all()
+    else:
+        saved_flights = []
     return render_template('home.html', form=form, saved_flights=saved_flights)
 
-
-@app.route('/get-cities<string:userInput>', methods=['GET', 'POST'])
-def get_city_code():
-    """Handle flight search form submission and fetch flight data."""
-    form = FlightForm()
-    if form.is_submitted() and form.validate():
-        form_data = {
-            'originLocationCode': form.departure_location.data,
-            'destinationLocationCode': form.arrival_location.data,
-            'departureDate': form.depart_date.data,
-            'returnDate': form.return_date.data,
-            'adults': form.passengers.data,
-            'max': 25
-        }
-        flight_data = fetch_flights(form_data)
-        if flight_data:
-            session['cities'] = flight_data
-            return render_template('search_results.html', flight_data=flight_data)
-        else:
-            return jsonify({"status": "error", "message": "Failed to fetch flights"})
-    return jsonify({"status": "error", "message": "Error in flight search."})
-
-def fetch_cities(params):
-    """fetch cities."""
-    url = "https://test.api.amadeus.com/v1/reference-data/locations"
-    headers = {"Authorization": f"Bearer {session['token']}"}
-    response = requests.get(url, params=params, headers=headers)
+def fetch_token():
+    """Request token from API"""
+    token_url = 'https://test.api.amadeus.com/v1/security/oauth2/token'
+    payload = {
+        'grant_type': 'client_credentials',
+        'client_id': CLIENT_ID,
+        'client_secret': CLIENT_SECRET
+    }
+    headers = {'Content-Type': 'application/x-www-form-urlencoded'}
+    response = requests.post(token_url, data=payload, headers=headers)
     if response.status_code == 200:
-        return response.json()
+        session["token"] = response.json().get('access_token')
+        return session["token"]
     else:
-        print("Failed to fetch flight destinations")
+        print("Failed to get token")
         return None
 
+@app.route('/token', methods=["GET"])
+def get_token():
+    """Get token for API"""
+    token = session.get('token')
+    if not token:
+        token = fetch_token() 
+        if not token:
+            return jsonify({"error": "Failed to fetch token"}), 400
+        session['token'] = token
+    return jsonify({"token": token, "weather_token": WEATHER_TOKEN})
 
 ######################################################################################################################
 # Flight search/show/save/delete  
 
 @app.route('/submit', methods=['GET', 'POST'])
 def submit_search():
-    """Handle flight search form submission and fetch flight data."""
+    """Handle flight search form submission and server-side validation"""
     form = FlightForm()
     if form.is_submitted() and form.validate():
-        form_data = {
-            'originLocationCode': form.departure_location.data,
-            'destinationLocationCode': form.arrival_location.data,
+        flight_form_data = {
+            'originLocationCode': form.departure_iatacode.data,
+            'destinationLocationCode': form.arrival_iatacode.data,
             'departureDate': form.depart_date.data,
             'returnDate': form.return_date.data,
             'adults': form.passengers.data,
             'max': 25
         }
-        flight_data = fetch_flights(form_data)
+        flight_data = fetch_flights(flight_form_data)
+        departure_name = form.departure_name.data
+        arrival_name = form.arrival_name.data
+        departure_iatacode = form.departure_iatacode.data
+        departure_lat = form.departure_lat.data
+        departure_long = form.departure_long.data
+        arrival_iatacode = form.arrival_iatacode.data
+        arrival_lat = form.arrival_lat.data
+        arrival_long = form.arrival_long.data
+        depart_date = form.depart_date.data
+        return_date = form.return_date.data
+        passengers = form.passengers.data
+        session['departure_name'] = departure_name
+        session['departure_iatacode'] = departure_iatacode
+        session['departure_lat'] = departure_lat
+        session['departure_long'] = departure_long
+        session['arrival_name'] = arrival_name
+        session['arrival_iatacode'] = arrival_iatacode
+        session['arrival_lat'] = arrival_lat
+        session['arrival_long'] = arrival_long
+        session['depart_date'] = depart_date
+        session['return_date'] = return_date
+        session['passengers'] = passengers
         if flight_data:
-            flight_data = unique_flights(flight_data)
-            session['flight_data'] = flight_data
-            return render_template('search_results.html', flight_data=flight_data)
-        else:
-            return jsonify({"status": "error", "message": "Failed to fetch flights"})
-    return jsonify({"status": "error", "message": "Error in flight search."})
+            flight_data = filter_flights(flight_data, departure_iatacode)
+            return render_template('search_results.html', 
+                flight_data=flight_data, 
+                departure_name=departure_name,
+                departure_iatacode=departure_iatacode, 
+                arrival_name=arrival_name,
+                arrival_iatacode=arrival_iatacode)
+    return redirect('/')
 
 def fetch_flights(params):
-    """fetch flights."""
+    """Fetch flights."""
     url = "https://test.api.amadeus.com/v2/shopping/flight-offers"
     headers = {"Authorization": f"Bearer {session['token']}"}
     response = requests.get(url, params=params, headers=headers)
     if response.status_code == 200:
         return response.json()
     else:
-        print("Failed to fetch flight destinations")
+        print("Failed to fetch flights.")
         return None
 
-def unique_flights(flights):
+def filter_flights(flights, iatacode):
     """Remove duplicate flights."""
     seen = set()
-    unique_flights = []
+    filter_flights = []
     for flight in flights['data']:
         flight_number = flight['itineraries'][0]['segments'][0]['number']
-        if flight_number not in seen:
-            unique_flights.append(flight)
+        departure_iatacode = flight['itineraries'][0]['segments'][0]['departure']['iataCode']
+        if flight_number not in seen and departure_iatacode == iatacode:
+            filter_flights.append(flight)
             seen.add(flight_number)
-    return {"data": unique_flights}
+        
+    return {"data": filter_flights}
 
-@app.route('/flight/<string:flight_id>', methods=['POST'])
-def save_flight(flight_id):
-    """Save selected flight data to the database."""
-    flight_data = session.get('flight_data')
-    if flight_data:
-        matched_flight = next((f for f in flight_data['data'] if f['id'] == flight_id), None)
-        if matched_flight:
-            flight_details = extract_flight_details(matched_flight)
-            location_departure = get_or_create_location(flight_details['departure_location'])
-            location_arrival = get_or_create_location(flight_details['arrival_location'])
-            new_flight = Flight(
-                departure_location=location_departure,
-                arrival_location=location_arrival,
-                depart_date=datetime.fromisoformat(flight_details['depart_first']),
-                return_date=datetime.fromisoformat(flight_details['return_last']),
-                passengers=flight_details['passengers'],
-                num_stops=flight_details['num_stops'],
-                total_duration=flight_details['total_duration'],
-                price=flight_details['price'],
-                user_id=g.user.id,
-            )
-      
-            db.session.add(new_flight)
-            safe_commit()
-            return jsonify({"status": "success", "message": "Flight saved"})
-        else:
-            return jsonify({"status": "failure", "message": "No data found"})
-    else:
-        return jsonify({"status": "failure", "message": "No data in session"})
+@app.route('/save_flight', methods=['POST'])
+def save_flight():
+    """Save selected flight to the database."""
+    flight_details = request.json  # Assuming data is sent as JSON in the request
+    if not g.user:
+        return jsonify({"status": "failure", "message": "User not authenticated"})
 
-def extract_flight_details(matched_flight):
-    itinerary = matched_flight['itineraries'][0]
-    segments = itinerary['segments']
+    if flight_details:
+        location_departure = get_location(session['departure_iatacode'])
+        location_arrival = get_location(session['arrival_iatacode'])
 
-    if len(segments) > 1:
-        first_segment = segments[0]
-        last_segment = segments[-1]
-    else:
-        first_segment = segments[0]
-        last_segment = segments[0]
+        if not location_departure:
+            location_departure = create_location(session['departure_name'], session['departure_iatacode'], session['departure_lat'], session['departure_long'])
 
-    departure_location = first_segment['departure']['iataCode']
-    arrival_location = last_segment['arrival']['iataCode']
-    depart_first = first_segment['departure']['at']
-    return_last = last_segment['arrival']['at']
+        if not location_arrival:
+            location_arrival = create_location(session['arrival_name'], session['arrival_iatacode'], session['arrival_lat'], session['arrival_long'])
 
-    passengers = len(matched_flight.get('travelerPricings', []))
-    num_stops = len(segments) - 1
-    total_duration = itinerary['duration']
-    price = matched_flight['price']['grandTotal']
+        existing_flight = Flight.query.filter_by(
+            flight_id=flight_details['flight_id'],
+            departure_location=location_departure,
+            arrival_location=location_arrival,
+            depart_date=session['depart_date'],
+            return_date=session['return_date'],
+            passengers=session['passengers'],
+            num_stops=flight_details['numStopsValue'],
+            total_duration=flight_details['durationValue'],
+            price=flight_details['priceValue'],
+            user_id=g.user.id
+        ).first()
 
-    return {
-        'departure_location': departure_location,
-        'arrival_location': arrival_location,
-        'depart_first': depart_first,
-        'return_last': return_last,
-        'passengers': passengers,
-        'num_stops': num_stops,
-        'total_duration': total_duration,
-        'price': price
-    }
+        if existing_flight:
+            return jsonify({"status": "failure", "message": "Similar flight already exists for the user"})
 
-def get_or_create_location(location_code):
-    location = Location.query.filter_by(code=location_code).first()
-    if not location:
-        location = Location(code=location_code)
-        db.session.add(location)
+        new_flight = Flight(
+            flight_id=flight_details['flight_id'],
+            departure_location=location_departure,
+            arrival_location=location_arrival,
+            depart_date=session['depart_date'],
+            return_date=session['return_date'],
+            passengers=session['passengers'],
+            num_stops=flight_details['numStopsValue'],
+            total_duration=flight_details['durationValue'],
+            price=flight_details['priceValue'],
+            user_id=g.user.id
+        )
+
+        db.session.add(new_flight)
         safe_commit()
+        return jsonify({"status": "success", "message": "Flight saved"})
+    else:
+        return jsonify({"status": "failure", "message": "No data received in the request"})
+
+def get_location(iatacode):
+    location = Location.query.filter_by(iatacode=iatacode).first()
     return location
 
-@app.route('/flight/<string:flight_id>', methods=['DELETE'])
-def delete_flight(flight_id):
+def create_location(name, iatacode, latitude, longitude):
+    location = Location(name=name, iatacode=iatacode, latitude=latitude, longitude=longitude)
+    db.session.add(location)
+    safe_commit()
+    return location
+
+@app.route('/flight/<int:id>', methods=['DELETE'])
+def delete_flight(id):
     """Delete a saved flight by its ID."""
-    flight = Flight.query.get(flight_id)
+    flight = Flight.query.get(id)
     if flight:
         db.session.delete(flight)
         safe_commit()
@@ -215,20 +231,24 @@ def delete_flight(flight_id):
         return jsonify({"status": "failure", "message": "Flight data not found in session"})
         
 ######################################################################################################################
-# User signup/login/logout and get token for external API
+# User signup/login/logout
 
 @app.before_request
-def add_user_to_g():
-    fetch_token()
+def request_context_setup():
+    """Handle page authorization."""
     if CURR_USER_KEY in session:
         g.user = User.query.get(session[CURR_USER_KEY])
 
-        NOT_ALLOWED_PATHS = ['/login', '/signup']
-        if request.path in NOT_ALLOWED_PATHS:
+        NOT_ALLOWED_PATHS_AUTHED = ['/login', '/signup']
+        if request.path in NOT_ALLOWED_PATHS_AUTHED:
             flash('Please log out to access this page.', 'danger')
-            return redirect('/login')
+            return redirect('/')
     else:
         g.user = None
+        NOT_ALLOWED_PATHS_UNAUTHED = ['/logout', '/users/profile', '/users/delete']
+        if request.path in NOT_ALLOWED_PATHS_UNAUTHED:
+            flash("Access unauthorized.", "danger")
+            return redirect("/")
 
 @app.route('/signup', methods=["GET", "POST"])
 def signup():
@@ -253,7 +273,7 @@ def signup():
 
 @app.route('/login', methods=["GET", "POST"])
 def login():
-    """Handle user signup."""
+    """Handle user login."""
     form = LoginForm()
     if form.is_submitted() and form.validate():
         user = User.authenticate(form.username.data, form.password.data)
@@ -270,45 +290,13 @@ def do_login(user):
 @app.route('/logout', methods=["GET"])
 def logout():
     """Handle user logout."""
-    if not g.user:
-        flash("Access unauthorized.", "danger")
-        return redirect("/")
-    do_logout()
+    if CURR_USER_KEY in session:
+        session.pop(CURR_USER_KEY) 
+    flash(f'Signed out successfully. See you again soon.', 'goodbye-msg')
     return redirect('/')
-
-def do_logout():
-    session.clear()
-    flash(f'Signed out successfully. See you again soon.', 'welcome-msg')
-
-def fetch_token():
-    if "token" in session:
-        return session["token"]
-    else:
-        token_url = 'https://test.api.amadeus.com/v1/security/oauth2/token'
-        payload = {
-            'grant_type': 'client_credentials',
-            'client_id': CLIENT_ID,
-            'client_secret': CLIENT_SECRET
-        }
-        headers = {'Content-Type': 'application/x-www-form-urlencoded'}
-        response = requests.post(token_url, data=payload, headers=headers)
-        if response.status_code == 200:
-            session["token"] = response.json().get('access_token')
-            return session["token"]
-        else:
-            print("Failed to get token")
-            return None
-
-@app.route('/token', methods=["GET"])
-def get_token():
-    token = fetch_token()
-    return jsonify({"token": token}) if token else (jsonify({"error": "Failed to fetch token"}), 400)
 
 ######################################################################################################################
 # General user routes
-    if not g.user:
-        flash("Access unauthorized.", "danger")
-        return redirect("/")
 
 @app.route('/users/<int:user_id>')
 def users_show(user_id):
@@ -317,14 +305,11 @@ def users_show(user_id):
         flash("Access unauthorized.", "danger")
         return redirect("/")
     user = User.query.get_or_404(user_id)
-    return render_template('users/show.html', user=user)
+    return render_template('users/detail.html', user=user)
 
 @app.route('/users/profile', methods=["GET", "POST"])
 def profile():
     """Handle profile update."""
-    if not g.user:
-        flash("Access unauthorized.", "danger")
-        return redirect("/")
     form = UserForm()
     if form.is_submitted() and form.validate():
         if form.username.data != g.user.username:
@@ -340,28 +325,24 @@ def profile():
             g.user.username = form.username.data
             g.user.email = form.email.data
             safe_commit()
-            return jsonify({"status": "success", "message": "Profile updated successfully"})
+            flash(f'Profile updated successfully', 'success')
+            return redirect('/users/profile')
+
         else:
-            return jsonify({"status": "failure", "message": "Error updating profile"})
+            flash(f'Invalid password', 'danger')
     return render_template('users/edit.html', form=form)
 
 @app.route('/users/delete', methods=["POST"])
 def delete_user():
     """Delete user account."""
-    if not g.user:
-        flash("Access unauthorized.", "danger")
-        return redirect("/")
     if g.user:
-        do_logout()
+        session.pop(CURR_USER_KEY) 
         db.session.delete(g.user)
         safe_commit()
+        flash(f'User deleted successfully.', 'goodbye-msg')
         return redirect('/')
     else:
         return jsonify({"error": "User not found"}), 404
 
 if __name__ == '__main__':
-    app.run()
-
-
-
-
+    app.run(debug=False)

@@ -11,7 +11,6 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
     <script src="{{ url_for('static', filename='script.js') }}"></script>
-    <script src="{{ url_for('static', filename='config.js') }}"></script>
     <!-- Bootstrap and related libraries -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -51,7 +50,7 @@
 
     <main id="content-container" style="padding-top: 60px;">
         
-        <div class="loader" style="display:none";>
+        <div class="loader" style="display:none">
             <div class="circle">
                 <div class="plane-wrapper">
                 <i class="fas fa-plane"></i>
@@ -60,14 +59,6 @@
         </div>
           
         <div id="flash-message"></div>
-
-        <div class="field-errors-container">
-            {% for field in form %}
-                {% for error in field.errors %}
-                    <span class="text-danger">{{ error }}</span>
-                {% endfor %}
-            {% endfor %}
-        </div>
 
         <div class="server-flash-container">
             {% for category, message in get_flashed_messages(with_categories=true) %}
