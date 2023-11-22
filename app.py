@@ -12,12 +12,37 @@ CURR_USER_KEY = "curr_user"
 app = Flask(__name__)
 
 # Config settings
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://mipezoes:TKZ3mUsfXtVRchdzn4BRhiiW7lMrzh-7@bubble.db.elephantsql.com/mipezoes'
-app.config['SECRET_KEY'] = SECRET_KEY
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL' , 'postgresql:///flightcast')
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 app.config['SQLALCHEMY_ECHO'] = False
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
+
+# app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL' , 'postgresql:///flightcast')
+
+
+
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://mipezoes:TKZ3mUsfXtVRchdzn4BRhiiW7lMrzh-7@bubble.db.elephantsql.com/mipezoes'
+
+# import os
+# app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
+
+print(os.getenv('SECRET_KEY') + '***********SECRET_KEY')
 print(os.getenv('DATABASE_URL') + '***********DATABASE URL')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # Init SQLAlchemy
 db.init_app(app)
