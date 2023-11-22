@@ -17,7 +17,7 @@ app.config['SECRET_KEY'] = SECRET_KEY
 app.config['SQLALCHEMY_ECHO'] = False
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
-print(os.getenv('DATABASE_URL'))
+print(os.getenv('DATABASE_URL') + '***********DATABASE URL')
 
 # Init SQLAlchemy
 db.init_app(app)
