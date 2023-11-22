@@ -1,10 +1,10 @@
-from datetime import datetime
 from flask import Flask, render_template, redirect, flash, session, request, jsonify, g
 from sqlalchemy.exc import IntegrityError
 from forms import FlightForm, UserForm, LoginForm
 from models import db, Flight, Location, User
 from config import SECRET_KEY, CLIENT_ID, CLIENT_SECRET, WEATHER_TOKEN
 import requests
+import os
 
 CURR_USER_KEY = "curr_user"
 
@@ -12,7 +12,7 @@ CURR_USER_KEY = "curr_user"
 app = Flask(__name__)
 
 # Config settings
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///flightcast'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 app.config['SECRET_KEY'] = SECRET_KEY
 app.config['SQLALCHEMY_ECHO'] = False
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
