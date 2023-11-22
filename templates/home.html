@@ -24,15 +24,15 @@
         <div class="form-row">
             <div class="form-group col-md-2">
                 {{form.depart_date.label}}
-                {{form.depart_date(class_="form-control", id="depart_date")}}
+                {{form.depart_date(class_="form-control flatpickr-input", id="depart_date", type="date")}}
             </div>
             <div class="form-group col-md-2">
                 {{form.return_date.label}}
-                {{form.return_date(class_="form-control", id="return_date")}}
+                {{form.return_date(class_="form-control flatpickr-input", id="return_date", type="date")}}
             </div>
             <div class="form-group col-md-1">
                 {{form.passengers.label}}
-                {{form.passengers(class_="form-control", id="passengers")}}
+                {{form.passengers(class_="form-control ", id="passengers")}}
             </div>
         </div>
         <button type="submit" class="btn btn-primary mb-5">Search</button>

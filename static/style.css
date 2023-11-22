@@ -12,6 +12,9 @@
     font-weight: bold;
 }
 
+.flatpickr-input  {
+    background-color: white !important;
+}
 .navbar-fixed-top {
     background-color: #4fbcff;
     position: fixed;

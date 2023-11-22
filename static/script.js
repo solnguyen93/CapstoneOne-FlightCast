@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", async function () {
+    flatpickr('.flatpickr-input');
 
     const token = await fetchToken();
     const weather_token = await fetchWeatherToken();
@@ -205,11 +206,11 @@ document.addEventListener("DOMContentLoaded", async function () {
                 return dateRegex.test(date);
             }
             if (!isValidDate(departDate)) {
-                handleValidationFailure('Depart date must be in the format mm/dd/yyyy.', event);
+                handleValidationFailure('Depart date must be in the format YYYY-MM-DD.', event);
                 return;
             } 
             if (!isValidDate(returnDate)) {
-                handleValidationFailure('Return date must be in the format mm/dd/yyyy.', event);
+                handleValidationFailure('Return date must be in the format YYYY-MM-DD.', event);
                 return;
             } 
             function parseDateString(dateString) {
