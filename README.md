@@ -31,7 +31,7 @@ Ensure PostgreSQL is installed and running. Create a database named 'flightcast'
 createdb flightcast
 ```
 
-Update the database URI in app.py if necessary. The default is set to 'postgresql:///flightcast'
+Update the database URI in app.py if necessary. The default is set to 'os.getenv('DATABASE_URL')', which is configured to equal 'postgresql:///flightcast'.
 
 ### Step 4: Set the FLASK_APP environment variable
 ```bash
@@ -43,9 +43,9 @@ export FLASK_APP=app.py
 flask run
 ```
 
-## Using the Provided Configurations
+## Using the Provided Configurations And ENV 
 
-This application comes with a pre-configured `config.py` that contains API keys for immediate use. These are meant for demo purposes and light usage only. Please adhere to the following guidelines:
+This application comes with a pre-configured `environment.evn` that contains API keys for immediate use. These are meant for demo purposes and light usage only. Please adhere to the following guidelines:
 
 - Do not use these keys for commercial or heavy personal projects.
 - Be mindful that the keys have rate limits, and excessive use may lead to temporary deactivation.
