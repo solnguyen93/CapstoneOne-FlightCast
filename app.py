@@ -22,21 +22,6 @@ CLIENT_ID = os.getenv('CLIENT_ID')
 CLIENT_SECRET = os.getenv('CLIENT_SECRET')
 WEATHER_TOKEN = os.getenv('WEATHER_TOKEN')
 
-print (app.config['SQLALCHEMY_DATABASE_URI'])
-print (app.config['SECRET_KEY'])
-print(CLIENT_ID)
-print(CLIENT_SECRET)
-print(WEATHER_TOKEN)
-
-# Add a route to handle the /cart.json request and return an empty response (status code 200).
-@app.route('/cart.json', methods=['GET'])
-def handle_cart_request():
-    # Optionally, you can log that the /cart.json request was received.
-    print("Received /cart.json request, but bypassing it.")
-    
-    # Return an empty response with status code 200.
-    return jsonify({}), 200
-    
 # Init SQLAlchemy
 db.init_app(app)
 
@@ -364,4 +349,4 @@ def delete_user():
         return jsonify({"error": "User not found"}), 404
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False)
