@@ -24,6 +24,9 @@ WEATHER_TOKEN = os.getenv('WEATHER_TOKEN')
 
 print (app.config['SQLALCHEMY_DATABASE_URI'])
 print (app.config['SECRET_KEY'])
+print(CLIENT_ID)
+print(CLIENT_SECRET)
+print(WEATHER_TOKEN)
 
 
 # Init SQLAlchemy
