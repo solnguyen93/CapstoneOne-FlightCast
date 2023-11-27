@@ -13,7 +13,8 @@ app = Flask(__name__)
 
 # Config settings
 load_dotenv('environment.env')
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
+app.config['SQLALCHEMY_DATABASE_URI'] = postgresql://mipezoes:TKZ3mUsfXtVRchdzn4BRhiiW7lMrzh-7@bubble.db.elephantsql.com/mipezoes 
+
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 app.config['SQLALCHEMY_ECHO'] = False
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
