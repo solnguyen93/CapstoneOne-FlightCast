@@ -12,16 +12,18 @@ CURR_USER_KEY = "curr_user"
 app = Flask(__name__)
 
 # Config settings
-if os.getenv('FLASK_ENV') == 'development': # Check if running in a local development environment
+if app.debug or os.getenv('FLASK_ENV') == 'development':
     load_dotenv('environment.env')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
-app.config['SECRET_KEY'] = 'test'
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 app.config['SQLALCHEMY_ECHO'] = False
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 CLIENT_ID = os.getenv('CLIENT_ID')
 CLIENT_SECRET = os.getenv('CLIENT_SECRET')
 WEATHER_TOKEN = os.getenv('WEATHER_TOKEN')
+
+print(os.getenv('FLASK_ENV'))
 
 # Init SQLAlchemy
 db.init_app(app)
@@ -350,4 +352,4 @@ def delete_user():
         return jsonify({"error": "User not found"}), 404
 
 if __name__ == '__main__':
-    app.run(debug=False)
+    app.run(debug=os.getenv('FLASK_ENV') == 'development')
