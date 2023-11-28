@@ -23,6 +23,8 @@ CLIENT_ID = os.getenv('CLIENT_ID')
 CLIENT_SECRET = os.getenv('CLIENT_SECRET')
 WEATHER_TOKEN = os.getenv('WEATHER_TOKEN')
 
+print(app.config['SECRET_KEY'])
+
 # Init SQLAlchemy
 db.init_app(app)
 
