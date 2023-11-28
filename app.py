@@ -12,6 +12,8 @@ CURR_USER_KEY = "curr_user"
 app = Flask(__name__)
 
 # Config settings
+
+app.config['FLASK_ENV'] = os.getenv('FLASK_ENV', 'development')
 if app.debug or os.getenv('FLASK_ENV') == 'development':
     load_dotenv('environment.env')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
@@ -23,6 +25,7 @@ CLIENT_ID = os.getenv('CLIENT_ID')
 CLIENT_SECRET = os.getenv('CLIENT_SECRET')
 WEATHER_TOKEN = os.getenv('WEATHER_TOKEN')
 
+print(os.environ)
 print(os.getenv('FLASK_ENV'))
 
 # Init SQLAlchemy
