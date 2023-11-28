@@ -12,7 +12,8 @@ CURR_USER_KEY = "curr_user"
 app = Flask(__name__)
 
 # Config settings
-load_dotenv('environment.env')
+if os.getenv('FLASK_ENV') == 'development': # Check if running in a local development environment
+    load_dotenv('environment.env')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 app.config['SQLALCHEMY_ECHO'] = False
