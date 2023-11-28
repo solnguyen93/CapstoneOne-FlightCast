@@ -15,15 +15,13 @@ app = Flask(__name__)
 if os.getenv('FLASK_ENV') == 'development': # Check if running in a local development environment
     load_dotenv('environment.env')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
-app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
+app.config['SECRET_KEY'] = 'test'
 app.config['SQLALCHEMY_ECHO'] = False
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 CLIENT_ID = os.getenv('CLIENT_ID')
 CLIENT_SECRET = os.getenv('CLIENT_SECRET')
 WEATHER_TOKEN = os.getenv('WEATHER_TOKEN')
-
-print(app.config['SECRET_KEY'])
 
 # Init SQLAlchemy
 db.init_app(app)
