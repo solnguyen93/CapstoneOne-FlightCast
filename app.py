@@ -34,6 +34,7 @@ try:
 except Exception as e:
     print(f"Error seeding the database: {e}")
 
+
 def safe_commit():
     try:
         db.session.commit()
@@ -46,10 +47,12 @@ def safe_commit():
         db.session.rollback()
         raise Exception("An unknown error occurred.")
 
+
 def flash_form_errors(form):
     for field, errors in form.errors.items():
         for error in errors:
             flash(f'{field.capitalize()}: {error}', 'danger')
+
 
 @app.route('/', methods=['GET'])
 def home():
@@ -58,10 +61,12 @@ def home():
     session.pop('search_results', None)
     form = FlightForm()
     if g.user:
-        saved_flights = Flight.query.filter_by(user_id=g.user.id).order_by(Flight.id.desc()).all()
+        saved_flights = Flight.query.filter_by(
+            user_id=g.user.id).order_by(Flight.id.desc()).all()
     else:
         saved_flights = []
     return render_template('home.html', form=form, saved_flights=saved_flights)
+
 
 def fetch_token():
     """Request token from API"""
@@ -80,19 +85,21 @@ def fetch_token():
         print("Failed to get token")
         return None
 
+
 @app.route('/token', methods=["GET"])
 def get_token():
     """Get token for API"""
     token = session.get('token')
     if not token:
-        token = fetch_token() 
+        token = fetch_token()
         if not token:
             return jsonify({"error": "Failed to fetch token"}), 400
         session['token'] = token
     return jsonify({"token": token, "weather_token": WEATHER_TOKEN})
 
 ######################################################################################################################
-# Flight search/show/save/delete  
+# Flight search/show/save/delete
+
 
 @app.route('/submit', methods=['GET', 'POST'])
 def submit_search():
@@ -132,13 +139,14 @@ def submit_search():
         session['passengers'] = passengers
         if flight_data:
             flight_data = filter_flights(flight_data, departure_iatacode)
-            return render_template('search_results.html', 
-                flight_data=flight_data, 
-                departure_name=departure_name,
-                departure_iatacode=departure_iatacode, 
-                arrival_name=arrival_name,
-                arrival_iatacode=arrival_iatacode)
+            return render_template('search_results.html',
+                                   flight_data=flight_data,
+                                   departure_name=departure_name,
+                                   departure_iatacode=departure_iatacode,
+                                   arrival_name=arrival_name,
+                                   arrival_iatacode=arrival_iatacode)
     return redirect('/')
+
 
 def fetch_flights(params):
     """Fetch flights."""
@@ -151,6 +159,7 @@ def fetch_flights(params):
         print("Failed to fetch flights.")
         return None
 
+
 def filter_flights(flights, iatacode):
     """Remove duplicate flights."""
     seen = set()
@@ -161,8 +170,9 @@ def filter_flights(flights, iatacode):
         if flight_number not in seen and departure_iatacode == iatacode:
             filter_flights.append(flight)
             seen.add(flight_number)
-        
+
     return {"data": filter_flights}
+
 
 @app.route('/save_flight', methods=['POST'])
 def save_flight():
@@ -176,10 +186,12 @@ def save_flight():
         location_arrival = get_location(session['arrival_iatacode'])
 
         if not location_departure:
-            location_departure = create_location(session['departure_name'], session['departure_iatacode'], session['departure_lat'], session['departure_long'])
+            location_departure = create_location(
+                session['departure_name'], session['departure_iatacode'], session['departure_lat'], session['departure_long'])
 
         if not location_arrival:
-            location_arrival = create_location(session['arrival_name'], session['arrival_iatacode'], session['arrival_lat'], session['arrival_long'])
+            location_arrival = create_location(
+                session['arrival_name'], session['arrival_iatacode'], session['arrival_lat'], session['arrival_long'])
 
         existing_flight = Flight.query.filter_by(
             flight_id=flight_details['flight_id'],
@@ -216,15 +228,19 @@ def save_flight():
     else:
         return jsonify({"status": "failure", "message": "No data received in the request"})
 
+
 def get_location(iatacode):
     location = Location.query.filter_by(iatacode=iatacode).first()
     return location
 
+
 def create_location(name, iatacode, latitude, longitude):
-    location = Location(name=name, iatacode=iatacode, latitude=latitude, longitude=longitude)
+    location = Location(name=name, iatacode=iatacode,
+                        latitude=latitude, longitude=longitude)
     db.session.add(location)
     safe_commit()
     return location
+
 
 @app.route('/flight/<int:id>', methods=['DELETE'])
 def delete_flight(id):
@@ -236,9 +252,10 @@ def delete_flight(id):
         return jsonify({"status": "success", "message": "Flight data deleted"})
     else:
         return jsonify({"status": "failure", "message": "Flight data not found in session"})
-        
+
 ######################################################################################################################
 # User signup/login/logout
+
 
 @app.before_request
 def request_context_setup():
@@ -252,10 +269,12 @@ def request_context_setup():
             return redirect('/')
     else:
         g.user = None
-        NOT_ALLOWED_PATHS_UNAUTHED = ['/logout', '/users/profile', '/users/delete']
+        NOT_ALLOWED_PATHS_UNAUTHED = [
+            '/logout', '/users/profile', '/users/delete']
         if request.path in NOT_ALLOWED_PATHS_UNAUTHED:
             flash("Access unauthorized.", "danger")
             return redirect("/")
+
 
 @app.route('/signup', methods=["GET", "POST"])
 def signup():
@@ -278,6 +297,7 @@ def signup():
         return redirect("/")
     return render_template('users/signup.html', form=form)
 
+
 @app.route('/login', methods=["GET", "POST"])
 def login():
     """Handle user login."""
@@ -290,20 +310,23 @@ def login():
         flash("Invalid credentials.", 'danger')
     return render_template('users/login.html', form=form)
 
+
 def do_login(user):
     session[CURR_USER_KEY] = user.id
     flash(f'Hello, {user.username}.', 'welcome-msg')
+
 
 @app.route('/logout', methods=["GET"])
 def logout():
     """Handle user logout."""
     if CURR_USER_KEY in session:
-        session.pop(CURR_USER_KEY) 
+        session.pop(CURR_USER_KEY)
     flash(f'Signed out successfully. See you again soon.', 'goodbye-msg')
     return redirect('/')
 
 ######################################################################################################################
 # General user routes
+
 
 @app.route('/users/<int:user_id>')
 def users_show(user_id):
@@ -314,6 +337,7 @@ def users_show(user_id):
     user = User.query.get_or_404(user_id)
     return render_template('users/detail.html', user=user)
 
+
 @app.route('/users/profile', methods=["GET", "POST"])
 def profile():
     """Handle profile update."""
@@ -322,11 +346,11 @@ def profile():
         if form.username.data != g.user.username:
             if User.query.filter(User.username == form.username.data).first():
                 flash("Username already taken", 'danger')
-                return redirect ('/users/profile')
+                return redirect('/users/profile')
         if form.email.data != g.user.email:
             if User.query.filter(User.email == form.email.data).first():
                 flash("Email already taken", 'danger')
-                return redirect ('/users/profile')
+                return redirect('/users/profile')
         user = User.authenticate(g.user.username, form.password.data)
         if user:
             g.user.username = form.username.data
@@ -339,17 +363,19 @@ def profile():
             flash(f'Invalid password', 'danger')
     return render_template('users/edit.html', form=form)
 
+
 @app.route('/users/delete', methods=["POST"])
 def delete_user():
     """Delete user account."""
     if g.user:
-        session.pop(CURR_USER_KEY) 
+        session.pop(CURR_USER_KEY)
         db.session.delete(g.user)
         safe_commit()
         flash(f'User deleted successfully.', 'goodbye-msg')
         return redirect('/')
     else:
         return jsonify({"error": "User not found"}), 404
+
 
 if __name__ == '__main__':
     app.run(debug=os.getenv('FLASK_ENV') == 'development')
