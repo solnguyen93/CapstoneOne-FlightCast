@@ -6,7 +6,6 @@ beniget==0.4.1
 blinker==1.6.2
 Brotli==1.0.9
 chardet==4.0.0
-cliapp==1.20180812.1
 click==8.1.7
 cmdtest==0.32+git
 command-not-found==0.3
