@@ -97,7 +97,7 @@ The API keys provided in this application are for demonstration purposes only. A
 
 ## APIs Used
 
-Please note that FlightCast is currently using the test version of the Amadeus API, so the data is limited to cities/airports in the United States, Spain, the United Kingdom, Germany, and India.
+Please note that FlightCast is using the free version of the Amadeus API, so our data for specific countries and airports is limited.
 
 -   **Exchange Rate API**: Provides real-time exchange rates that the server uses for converting prices. `https://api.exchangerate-api.com/v4/latest/EUR`
 -   **OAuth2 Token**: Used to authenticate API requests for Amadeus. `https://test.api.amadeus.com/v1/security/oauth2/token`
