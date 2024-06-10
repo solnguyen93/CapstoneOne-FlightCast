@@ -1,6 +1,6 @@
 # FlightCast
 
-FlightCast is a web application that allows users to search for flights, providing them with options, pricing, and weather forecasts for their destination. It's currently not being hosted due to cost constraints.
+FlightCast is a web application that allows users to search for flights, providing them with options, pricing, and weather forecasts for their destination. It's currently hosted on Render [Click Here](https://flightcast.onrender.com). Occasionally, it might not work as expected due to issues on Render.
 
 ## Getting Started
 
