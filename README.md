@@ -46,17 +46,19 @@ export FLASK_APP=app.py
 flask run
 ```
 
-## Using the Provided Configurations And ENV
+## Environment Variables
 
-This application comes with a pre-configured `environment.evn` that contains API keys for immediate use. These are meant for demo purposes and light usage only. Please adhere to the following guidelines:
+Copy the example file and fill in your own keys:
 
--   Do not use these keys for commercial or heavy personal projects.
--   Be mindful that the keys have rate limits, and excessive use may lead to temporary deactivation.
--   If you plan to fork this project or use it extensively, consider registering for your own API keys to avoid service interruptions and potential misuse.
+```bash
+cp environment.env.example environment.env
+```
 
-## Disclaimer
+-   `CLIENT_ID` / `CLIENT_SECRET`: an [Amadeus for Developers](https://developers.amadeus.com) API key and secret
+-   `WEATHER_TOKEN`: a [Visual Crossing](https://www.visualcrossing.com) weather API key
+-   `SECRET_KEY`: any long random string
 
-The API keys provided in this application are for demonstration purposes only. As the owner of these keys, I do not assume responsibility for any misuse or costs incurred. Users are encouraged to obtain their own API keys for prolonged or personal use to ensure security and prevent potential abuse.
+`environment.env` is gitignored and is only loaded in development. In production (e.g. Render), set these as environment variables in the host's settings.
 
 ## Database Schema
 
