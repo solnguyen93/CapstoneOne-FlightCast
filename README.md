@@ -4,61 +4,61 @@ FlightCast is a web application that allows users to search for flights, providi
 
 ## Getting Started
 
-To get a local copy up and running follow these steps.
+Follow these steps to run FlightCast on your own computer.
 
 ### Prerequisites
 
--   Install Python 3.8 or higher: [Python Installation Guide](https://www.python.org/downloads/)
--   Install PostgreSQL: [PostgreSQL Installation Guide](https://www.postgresql.org/download/)
+-   [Python 3.8 or higher](https://www.python.org/downloads/)
+-   [PostgreSQL](https://www.postgresql.org/download/), installed and running
 
-### Step 1: Clone the Repository
+### 1. Clone the repository
 
 ```bash
-git clone https://github.com/solnguyen93/CapstoneProjectOne-FlightCast.git
+git clone https://github.com/solnguyen93/CapstoneOne-FlightCast.git
+cd CapstoneOne-FlightCast
 ```
 
-### Step 2: Install Dependencies
+### 2. Install dependencies
+
+A virtual environment keeps FlightCast's packages separate from the rest of your system:
 
 ```bash
-cd CapstoneProjectOne-FlightCast
+python3 -m venv venv
+source venv/bin/activate        # on Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### Step 3: Database Configuration
-
-Ensure PostgreSQL is installed and running. Create a database named 'flightcast':
+### 3. Create the database
 
 ```bash
 createdb flightcast
 ```
 
-Update the database URI in app.py if necessary. The default is set to 'os.getenv('DATABASE_URL')', which is configured to equal 'postgresql:///flightcast'.
+You don't need to create any tables. FlightCast builds them and loads sample data each time it starts.
 
-### Step 4: Set the FLASK_APP environment variable
-
-```bash
-export FLASK_APP=app.py
-```
-
-### Step 5: Run the Flask application
-
-```bash
-flask run
-```
-
-## Environment Variables
-
-Copy the example file and fill in your own keys:
+### 4. Add your API keys
 
 ```bash
 cp environment.env.example environment.env
 ```
 
--   `CLIENT_ID` / `CLIENT_SECRET`: an [Amadeus for Developers](https://developers.amadeus.com) API key and secret
--   `WEATHER_TOKEN`: a [Visual Crossing](https://www.visualcrossing.com) weather API key
+Then fill in `environment.env`:
+
+-   `CLIENT_ID` / `CLIENT_SECRET`: a free [Amadeus for Developers](https://developers.amadeus.com) API key and secret (flight search)
+-   `WEATHER_TOKEN`: a free [Visual Crossing](https://www.visualcrossing.com) weather API key
 -   `SECRET_KEY`: any long random string
 
-`environment.env` is gitignored and is only loaded in development. In production (e.g. Render), set these as environment variables in the host's settings.
+### 5. Start the app
+
+```bash
+export FLASK_APP=app.py
+export FLASK_ENV=development    # loads environment.env
+flask run
+```
+
+Open http://localhost:5000 and sign in with the demo account: username `aaa`, password `ssssss`.
+
+**Note:** FlightCast resets its database to the sample data every time it starts, so saved flights and new accounts don't carry over between restarts.
 
 ## Database Schema
 
